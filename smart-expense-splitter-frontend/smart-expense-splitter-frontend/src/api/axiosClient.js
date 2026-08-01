@@ -4,7 +4,7 @@ import axios from 'axios';
 // everywhere. This is what lets us configure the base URL and the auth header
 // logic in exactly one place.
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
 });
 
 // Request interceptor: runs before EVERY request made with this instance.

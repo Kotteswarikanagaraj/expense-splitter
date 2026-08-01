@@ -30,7 +30,7 @@ export function useGroupSocket(groupId, onMessage) {
 
     const client = new Client({
       // SockJS wraps the actual transport; STOMP talks over it.
-      webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+      webSocketFactory: () => new SockJS(import.meta.env.VITE_WS_BASE_URL || 'http://localhost:8080/ws'),
       reconnectDelay: 5000, // auto-reconnect if the connection drops
       onConnect: () => {
         client.subscribe(`/topic/group/${groupId}`, (message) => {

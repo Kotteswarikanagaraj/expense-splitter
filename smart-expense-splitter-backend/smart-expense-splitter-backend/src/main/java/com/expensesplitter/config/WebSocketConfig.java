@@ -1,5 +1,6 @@
 package com.expensesplitter.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -26,21 +27,21 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    // Same property used by SecurityConfig's CORS setup — one source of truth
+    // for "which frontend URLs are allowed to talk to this backend."
+    @Value("${app.cors.allowed-origins:http://localhost:5173}")
+    private String allowedOrigins;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("http://localhost:5173") // Vite dev server
+                .setAllowedOriginPatterns(allowedOrigins.split(","))
                 .withSockJS(); // fallback transport (long-polling etc.) if native WS is blocked
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        // Any message the server sends to a destination starting with /topic
-        // gets broadcast to all subscribers of that exact destination.
         registry.enableSimpleBroker("/topic");
-
-        // Prefix reserved for client-to-server messages (not used yet in Phase 3,
-        // since the frontend only listens — it never publishes over the socket).
         registry.setApplicationDestinationPrefixes("/app");
     }
 }
